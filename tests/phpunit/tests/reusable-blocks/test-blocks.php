@@ -105,9 +105,95 @@ class TestBlocks extends \OTGS_TestCase {
 			'args'   => [ $post->post_content ],
 			'return' => $blocks,
 		]);
+		
+		// Second stack
+		$block = $this->getMockBuilder( 'WP_Post' )->disableOriginalConstructor()->getMock();
+		$block->post_content = 'some content';
+
+		\WP_Mock::userFunction( 'get_post', [
+			'args'   => [ $block_id ],
+			'return' => $block,
+		]);
+		\WP_Mock::userFunction( 'parse_blocks', [
+			'args'   => [ $block->post_content ],
+			'return' => [],
+		]);
+		
 		$subject = new Blocks();
 		$this->assertEquals(
 			[ $block_id ],
+			$subject->getIdsFromPost( $post_id )
+		);
+		unset( $GLOBALS['wp_version'] );
+	}
+
+
+
+	/**
+	 * @test
+	 * @group wpmlcore-6598
+	 */
+	public function it_should_get_nested_block_ids_from_post() {
+		$GLOBALS['wp_version'] = '5.1.0';
+
+		$post_id        = 123;
+		$block_id       = 456;
+		$child_block_id = 789;
+
+		// First stack
+		$main_post = $this->getMockBuilder( 'WP_Post' )->disableOriginalConstructor()->getMock();
+		$main_post->post_content = 'some block content';
+
+		$blocks_in_first_stack = [
+			[
+				'blockName' => 'core/block',
+				'attrs'     => [ 'ref' => (string) $block_id ],
+			],
+		];
+		\WP_Mock::userFunction( 'get_post', [
+			'args'   => [ $post_id ],
+			'return' => $main_post,
+		]);
+		\WP_Mock::userFunction( 'parse_blocks', [
+			'args'   => [ $main_post->post_content ],
+			'return' => $blocks_in_first_stack,
+		]);
+
+		// Second stack
+		$block_post = $this->getMockBuilder( 'WP_Post' )->disableOriginalConstructor()->getMock();
+		$block_post->post_content = 'some child block content';
+
+		$blocks_in_second_stack = [
+			[
+				'blockName' => 'core/block',
+				'attrs'     => [ 'ref' => (string) $child_block_id ],
+			],
+		];
+		\WP_Mock::userFunction( 'get_post', [
+			'args'   => [ $block_id ],
+			'return' => $block_post,
+		]);
+		\WP_Mock::userFunction( 'parse_blocks', [
+			'args'   => [ $block_post->post_content ],
+			'return' => $blocks_in_second_stack,
+		]);
+
+		// Last stack, returns an empty array of blocks
+		$child_block_post = $this->getMockBuilder( 'WP_Post' )->disableOriginalConstructor()->getMock();
+		$child_block_post->post_content = 'some content with no reusable block';
+
+		\WP_Mock::userFunction( 'get_post', [
+			'args'   => [ $child_block_id ],
+			'return' => $child_block_post,
+		]);
+		\WP_Mock::userFunction( 'parse_blocks', [
+			'args'   => [ $child_block_post->post_content ],
+			'return' => [],
+		]);
+
+		$subject = new Blocks();
+		$this->assertEquals(
+			[ $block_id, $child_block_id ],
 			$subject->getIdsFromPost( $post_id )
 		);
 		unset( $GLOBALS['wp_version'] );
