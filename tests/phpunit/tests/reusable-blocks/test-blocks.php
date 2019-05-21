@@ -122,7 +122,7 @@ class TestBlocks extends \OTGS_TestCase {
 		$subject = new Blocks();
 		$this->assertEquals(
 			[ $block_id ],
-			$subject->getIdsFromPost( $post_id )
+			$subject->getChildrenIdsFromPost( $post_id )
 		);
 		unset( $GLOBALS['wp_version'] );
 	}
@@ -194,7 +194,7 @@ class TestBlocks extends \OTGS_TestCase {
 		$subject = new Blocks();
 		$this->assertEquals(
 			[ $block_id, $child_block_id ],
-			$subject->getIdsFromPost( $post_id )
+			$subject->getChildrenIdsFromPost( $post_id )
 		);
 		unset( $GLOBALS['wp_version'] );
 	}
@@ -213,6 +213,6 @@ class TestBlocks extends \OTGS_TestCase {
 
 		$subject = new Blocks();
 
-		$this->assertEmpty( $subject->getIdsFromPost( $post_id ) );
+		$this->assertEmpty( $subject->getChildrenIdsFromPost( $post_id ) );
 	}
 }

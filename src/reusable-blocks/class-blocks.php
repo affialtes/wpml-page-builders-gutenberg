@@ -23,7 +23,7 @@ class Blocks {
 	 *
 	 * @return array
 	 */
-	public function getIdsFromPost( $post_id ) {
+	public function getChildrenIdsFromPost( $post_id ) {
 		$post = get_post( $post_id );
 
 		if ( $post ) {
@@ -34,7 +34,7 @@ class Blocks {
 				       && is_numeric( $block['attrs']['ref'] );
 			})->map( function( $block ) {
 				$block_id = (int) $block['attrs']['ref'];
-				return array_merge( [ $block_id ], $this->getIdsFromPost( $block_id ) );
+				return array_merge( [ $block_id ], $this->getChildrenIdsFromPost( $block_id ) );
 			})->flatten()->toArray();
 		}
 
