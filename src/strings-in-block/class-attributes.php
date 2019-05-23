@@ -13,7 +13,7 @@ class Attributes extends Base {
 		$strings = [];
 		$attrs   = $this->getAttributes( $block );
 
-		if ( $attrs ) {
+		if ( $attrs && isset( $block->blockName ) ) {
 			$keys    = $this->getKeyConfig( $block );
 			$strings = $this->findStringsRecursively( $attrs, $keys, $block->blockName );
 		}
@@ -129,7 +129,7 @@ class Attributes extends Base {
 	public function update( \WP_Block_Parser_Block $block, array $string_translations, $lang ) {
 		$attrs = $this->getAttributes( $block );
 
-		if ( $attrs ) {
+		if ( $attrs && isset( $block->blockName ) ) {
 			$keys         = $this->getKeyConfig( $block );
 			$block->attrs = $this->updateStringsRecursively( $attrs, $keys, $string_translations, $lang, $block->blockName );
 		}

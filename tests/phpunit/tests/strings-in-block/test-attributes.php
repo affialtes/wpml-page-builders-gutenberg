@@ -15,6 +15,27 @@ class TestAttributes extends \OTGS_TestCase {
 	/**
 	 * @test
 	 */
+	public function it_should_not_find_attribute_strings_if_blockname_is_not_set() {
+		$config_array = [
+			self::BLOCK_NAME => [
+				'key' => [],
+			],
+		];
+
+		$block = $this->getBlock();
+		$block->attrs = [ 'foo' => 'bar' ];
+
+		$config  = $this->getConfig( $config_array );
+		$subject = $this->getSubject( $config );
+
+		$strings = $subject->find( $block );
+
+		$this->assertEmpty( $strings );
+	}
+
+	/**
+	 * @test
+	 */
 	public function it_should_find_attribute_strings() {
 		$config_array = [
 			self::BLOCK_NAME => [
@@ -165,6 +186,27 @@ class TestAttributes extends \OTGS_TestCase {
 		$this->assertEquals( self::BLOCK_NAME, $string->name );
 		$this->assertEquals( $value, $string->value );
 		$this->assertEquals( $type, $string->type );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_not_update_attributes_if_blockname_is_not_set() {
+		$config_array = [
+			self::BLOCK_NAME => [
+				'key' => [],
+			],
+		];
+
+		$block = $this->getBlock();
+		$block->attrs = [ 'foo' => 'bar' ];
+
+		$config  = $this->getConfig( $config_array );
+		$subject = $this->getSubject( $config );
+
+		$updated_block = $subject->update( $block, [], 'fr' );
+
+		$this->assertEquals( $block, $updated_block );
 	}
 
 	/**
