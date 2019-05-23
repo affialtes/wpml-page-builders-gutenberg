@@ -9,7 +9,8 @@ namespace WPML\PB\Gutenberg\StringsInBlock;
  */
 class TestAttributes extends \OTGS_TestCase {
 
-	const BLOCK_NAME = 'block/type';
+	const BLOCK_NAMESPACE = 'block';
+	const BLOCK_NAME      = 'block/type';
 
 	/**
 	 * @test
@@ -32,6 +33,9 @@ class TestAttributes extends \OTGS_TestCase {
 					],
 					'key3' => [],
 				],
+			],
+			self::BLOCK_NAMESPACE => [
+				'key' => []
 			],
 		];
 
@@ -128,6 +132,34 @@ class TestAttributes extends \OTGS_TestCase {
 		$this->assertCount( 0, $strings );
 	}
 
+	/**
+	 * @test
+	 */
+	public function it_should_find_attribute_strings_with_config_from_block_namespace() {
+		$config_array = [
+			self::BLOCK_NAMESPACE => [
+				'key' => [
+					'foo' => [],
+				],
+			],
+		];
+
+		$block = $this->getBlock();
+		$block->blockName = self::BLOCK_NAME;
+		$block->attrs = [
+			'foo' => 'String for foo',
+			'bar' => 'String for bar',
+		];
+
+		$config  = $this->getConfig( $config_array );
+		$subject = $this->getSubject( $config );
+
+		$strings = $subject->find( $block );
+
+		$this->assertCount( 1, $strings );
+		$this->checkString( $strings[0], 'String for foo', 'LINE' );
+	}
+
 	private function checkString( \stdClass $string, $value, $type ) {
 		$this->assertEquals( md5( self::BLOCK_NAME . $value ), $string->id, $value );
 		$this->assertEquals( self::BLOCK_NAME, $string->name );
@@ -158,6 +190,9 @@ class TestAttributes extends \OTGS_TestCase {
 					],
 					'key3' => [],
 				],
+			],
+			self::BLOCK_NAMESPACE => [
+				'key' => []
 			],
 		];
 
@@ -268,6 +303,49 @@ class TestAttributes extends \OTGS_TestCase {
 		$expected_attrs = [
 			'_something' => 'Original string A',
 			'something'  => 'Translated string A',
+		];
+
+		$config  = $this->getConfig( $config_array );
+		$subject = $this->getSubject( $config );
+
+		$updated_block = $subject->update( $block, $translations, $lang );
+
+		$this->assertEquals( $expected_attrs, $updated_block->attrs );
+	}
+
+	/**
+	 * @test
+	 */
+	public function it_should_update_attributes_with_config_from_block_namespace() {
+		$lang = 'fr';
+
+		$config_array = [
+			self::BLOCK_NAMESPACE => [
+				'key' => [
+					'foo' => [],
+				],
+			],
+		];
+
+		$block = $this->getBlock();
+		$block->blockName = self::BLOCK_NAME;
+		$block->attrs = [
+			'foo' => 'String for foo',
+			'bar' => 'String for bar',
+		];
+
+		$translations = [
+			md5( self::BLOCK_NAME . 'String for foo' ) => [
+				$lang => [
+					'status' => ICL_TM_COMPLETE,
+					'value'  => 'Translated string for foo',
+				],
+			],
+		];
+
+		$expected_attrs = [
+			'foo' => 'Translated string for foo',
+			'bar' => 'String for bar',
 		];
 
 		$config  = $this->getConfig( $config_array );
