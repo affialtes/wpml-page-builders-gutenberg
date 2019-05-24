@@ -411,7 +411,12 @@ class TestAttributes extends \OTGS_TestCase {
 	}
 
 	private function getBlock() {
-		return $this->getMockBuilder( '\WP_Block_Parser_Block' )
+		$block = $this->getMockBuilder( '\WP_Block_Parser_Block' )
 		            ->disableOriginalConstructor()->getMock();
+
+		$block->blockName = null;
+		$block->attrs     = null;
+
+		return $block;
 	}
 }

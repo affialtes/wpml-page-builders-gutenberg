@@ -27,7 +27,9 @@ abstract class Base implements StringsInBlock {
 
 		if ( isset( $block->blockName, $this->block_types[ $block->blockName ][ $type ] ) ) {
 			return $this->block_types[ $block->blockName ][ $type ];
-		} elseif ( isset( $block->blockName) ) {
+		}
+
+		if ( isset( $block->blockName ) ) {
 			$block_name_arr  = explode( '/', $block->blockName );
 			$block_namespace = reset( $block_name_arr );
 
